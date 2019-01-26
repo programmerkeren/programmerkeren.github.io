@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <!-- Meta Tag -->
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+   <!-- Title -->
+   <title>Typography Apps</title>
+
+   <!-- Style -->
+   <style>
+      body {
+         background-color: #eaeaea;
+      }
+      .edit {
+         position: absolute;
+      }
+      .canvas {
+         border: 1px solid #808080;
+         background-color: #ffffff;
+      }
+      span {
+         display: inline-block;
+      }
+      span:hover {
+         cursor: pointer;
+      }
+      .input {
+         height: 30px;
+         margin-top: 10px;
+         margin-right: 5px;
+         padding: 0px 10px;
+      }
+      select {
+         height: 35px;
+         padding: 0px 10px;
+      }
+      button {
+         height: 35px;
+         margin-left: 10px;
+         padding: 0px 10px;
+      }
+   </style>
+
+   <!-- Script -->
+   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+   <script src="js/html2canvas.js"></script>
+   <script src="js/canvas2image.js"></script>
+   <script src="js/jquery.jeditable.js"></script>
+</head>
+<body>
+   
+   <div class="canvas"></div>
+
+   <div id="formEl"></div>
+
+<script>
+
+   // Declaration Global
+   var elSelect = [];
+   elSelect[0] = null;
+
+   // Declaration Width and Height Page
+   var docBody = document.body;
+   var docEl = document.documentElement;
+   var pageWidth = document.body.scrollWidth - 10;
+   var pageHeight = Math.max( docBody.scrollHeight, docBody.offsetHeight, docEl.clientHeight, docEl.scrollHeight, docEl.offsetHeight ) - 80;
+
+   // Canvas Clicked Function
+   $('.canvas').click(function() {
+      elSelect[0] = [];
+      $('#fontSize').prop('disabled', 'on');
+
+      $('.edit').removeClass('ui-draggable ui-draggable-handle');
+   });
+
+   // When Text Clicked by User
+   $(document).on('click', '.edit', function() {
+      elSelect[0] = $(this).index();
+      $('#fontSize').removeProp('disabled');
+   });
+
+   // When Text Double Clicked by User
+   $(document).on('dblclick', '.edit', function() {
+      $('.edit').eq(elSelect[0]).editable(function(value) {
+         return value;
+      });
+   });
+
+   // When Text Mouse Hold by User
+   $(document).on('mousedown', '.edit', function() {
+      $(this).draggable();
+   });
+
+   // Set Dinamis Canvas Width and Height
+   $('.canvas').css({
+      'width': pageWidth,
+      'height': pageHeight
+   });
+
+   // Draggable Function
+   // $('.edit').draggable();
+   $(document).on('click', '#addText', function() {
+      $('.canvas').prepend(
+        '<span class="edit">Hello World</span>'
+      );
+   });
+
+   $(document).on('change', '#fontSize', function() {
+      // $('#checkData').html( $(this).val() );
+      $('.edit').eq(elSelect[0]).css('fontSize', $(this).val() + 'px');
+   });
+
+   // Print and Download Image
+   $(document).on('click', '#save', function() {
+      var workArea = $(".canvas").get(0);
+      html2canvas(workArea).then(function (canvas) {
+         
+         var canvasWidth = canvas.width;
+         var canvasHeight = canvas.height;
+
+         var img = Canvas2Image.convertToImage(canvas, canvasWidth, canvasHeight);
+
+         let type = $('#sel').val();
+         let w = $('#imgW').val();
+         let h = $('#imgH').val();
+         let f = $('#fileName').val();
+         w = (w === '') ? canvasWidth : w;
+         h = (h === '') ? canvasHeight : h;
+         
+         // Save as Image
+         Canvas2Image.saveAsImage(canvas, w, h, type, f);
+
+      });
+   });
+
+   $(document).ready(function() {
+      addFormPrintElement();
+   });
+
+   function addFormPrintElement() {
+      var formEl;
+      $('#formEl').prepend(
+         '<input class="input" type="number" value="" id="imgW" placeholder="Image Width">' +
+         '<input class="input" type="number" value="" id="imgH" placeholder="Image Height">' +
+         '<input class="input" type="text" value="" id="fileName" placeholder="File Name">' +
+         '<select id="sel">' +
+            '<option value="png">PNG</option>' +
+            '<option value="jpeg">JPEG</option>' +
+            '<option value="bmp">BMP</option>' +
+         '</select>' +
+         '<button id="save">Save and Download</button>' +
+         '<button id="addText">Tambah Teks</button>' +
+         '<span id="checkData"></span>' +
+         '<select style="margin-left:10px" id="fontSize" disabled>' +
+            '<option value="15">15</option>' +
+            '<option value="20">20</option>' +
+            '<option value="30">30</option>' +
+            '<option value="40">40</option>' +
+            '<option value="50">50</option>' +
+            '<option value="70">70</option>' +
+         '</select>'
+      );
+   }
+
+</script>
+</body>
+</html>
